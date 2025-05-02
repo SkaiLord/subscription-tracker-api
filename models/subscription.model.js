@@ -74,6 +74,22 @@ const subscriptionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Single-field indexes
+subscriptionSchema.index({ user: 1 });
+subscriptionSchema.index({ category: 1 });
+
+// Compound index
+subscriptionSchema.index({ user: 1, renewalDate: 1 });
+
+// Text index
+subscriptionSchema.index({ name: "text" });
+
+// Partial index
+subscriptionSchema.index(
+  { user: 1 },
+  { partialFilterExpression: { status: "active" }, name: "active_user_subs" }
+);
+
 // Auto-calculate renewal date if missing.
 subscriptionSchema.pre("save", function (next) {
   if (!this.renewalDate) {

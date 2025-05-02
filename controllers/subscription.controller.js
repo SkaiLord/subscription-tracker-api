@@ -99,7 +99,7 @@ export const deleteSubscription = async (req, res, next) => {
       throw error;
     }
 
-    await subscription.remove();
+    await subscription.deleteOne();
 
     res.status(200).json({ success: true, message: "Subscription deleted" });
   } catch (e) {
@@ -140,6 +140,46 @@ export const getUpcomingRenewals = async (req, res, next) => {
       renewalDate: { $gte: new Date() },
     });
 
+    res.status(200).json({ success: true, data: subscriptions });
+  } catch (e) {
+    next(e);
+  }
+};
+
+export const getSubscriptionBySearch = async (req, res, next) => {
+  try {
+    const { q } = req.query;
+
+    const subscriptions = await Subscription.find({
+      $text: { $search: q },
+    });
+
+    res.status(200).json({ success: true, data: subscriptions });
+  } catch (e) {
+    next(e);
+  }
+};
+
+export const getSubscriptionByCategory = async (req, res, next) => {
+  try {
+    const { category } = req.query;
+
+    const subscriptions = await Subscription.find({
+      category: { $regex: category, $options: "i" },
+    });
+    res.status(200).json({ success: true, data: subscriptions });
+  } catch (e) {
+    next(e);
+  }
+};
+
+export const getSubscriptionByStatus = async (req, res, next) => {
+  try {
+    const { status } = req.query;
+
+    const subscriptions = await Subscription.find({
+      status: { $regex: status, $options: "i" },
+    });
     res.status(200).json({ success: true, data: subscriptions });
   } catch (e) {
     next(e);
